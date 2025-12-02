@@ -31,8 +31,8 @@ jobs:
         echo "EC2 Stack deployed with S3 access!"
         
         # Mostrar la URL del servidor web
+        echo "URL del servidor web:"
         aws cloudformation describe-stacks \
           --stack-name MinTicEC2Stack \
           --query 'Stacks[0].Outputs[?OutputKey==`WebsiteURL`].OutputValue' \
-          --output text 
-
+          --output text

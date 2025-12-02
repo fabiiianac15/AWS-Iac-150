@@ -62,7 +62,7 @@ Resources:
         - Key: Name
           Value: MinTic EC2 Instance
         - Key: Version
-          Value: v2-with-s3-zip
+          Value: v3-force-update
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
