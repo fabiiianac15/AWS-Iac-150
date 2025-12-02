@@ -20,15 +20,19 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Deploy EC2 Stack
+    - name: Deploy EC2 Stack with S3 Access
       run: |
         aws cloudformation deploy \
           --template-file templates/ec2.yml \
-          --stack-name MinTicEC2Stack 
-
-    - name: Deploy S3 Stack
-      run: |
-        aws cloudformation deploy \
-          --template-file templates/s3.yml \
-          --stack-name MinTicS3 
+          --stack-name MinTicEC2Stack \
+          --parameter-overrides S3BucketName=mintic-bucket-004807598266-us-east-1 \
+          --capabilities CAPABILITY_IAM \
+          --no-fail-on-empty-changeset
+        echo "EC2 Stack deployed with S3 access!"
+        
+        # Mostrar la URL del servidor web
+        aws cloudformation describe-stacks \
+          --stack-name MinTicEC2Stack \
+          --query 'Stacks[0].Outputs[?OutputKey==`WebsiteURL`].OutputValue' \
+          --output text 
 

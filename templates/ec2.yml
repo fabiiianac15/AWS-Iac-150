@@ -1,5 +1,35 @@
 ---
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: Nombre del bucket S3 de donde descargar contenido
+    Default: ''
+
 Resources:
+  # Rol IAM para EC2 con acceso a S3
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+      Tags:
+        - Key: Name
+          Value: MinTic EC2 S3 Access Role
+
+  # Instance Profile para asociar el rol a EC2
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2Role
+
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -25,18 +55,46 @@ Resources:
       AvailabilityZone: us-east-1a
       ImageId: ami-0f88e80871fd81e91
       InstanceType: t3.micro
+      IamInstanceProfile: !Ref EC2InstanceProfile
       SecurityGroups:
         - !Ref EC2SecurityGroup
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          # Utiliza esto para tus datos de usuario
-          # Instala httpd (Version: Linux 2)
+          # Actualizar sistema e instalar Apache y unzip
           yum update -y
-          yum install -y httpd
+          yum install -y httpd unzip
           systemctl start httpd
           systemctl enable httpd
-          echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+          
+          # Si hay un bucket S3 especificado, descargar y descomprimir el ZIP
+          if [ -n "${S3BucketName}" ]; then
+            # Descargar el archivo ZIP desde S3
+            aws s3 cp s3://${S3BucketName}/proyecto.zip /tmp/proyecto.zip --region us-east-1
+            
+            # Verificar si se descargó correctamente
+            if [ -f /tmp/proyecto.zip ]; then
+              # Descomprimir en el directorio web
+              unzip -o /tmp/proyecto.zip -d /var/www/html/
+              
+              # Limpiar el archivo temporal
+              rm -f /tmp/proyecto.zip
+              
+              # Dar permisos correctos
+              chown -R apache:apache /var/www/html/
+              chmod -R 755 /var/www/html/
+              
+              echo "Contenido extraído desde S3: ${S3BucketName}/proyecto.zip"
+            else
+              echo "<h1>Error: No se pudo descargar proyecto.zip desde S3</h1>" > /var/www/html/index.html
+            fi
+          else
+            # Si no hay bucket, crear página por defecto
+            echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
+          fi
+          
+          # Reiniciar Apache para aplicar cambios
+          systemctl restart httpd
       Tags:
         - Key: Name
           Value: MinTic EC2 Instance
