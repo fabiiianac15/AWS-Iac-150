@@ -58,6 +58,11 @@ Resources:
       IamInstanceProfile: !Ref EC2InstanceProfile
       SecurityGroups:
         - !Ref EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: MinTic EC2 Instance
+        - Key: Version
+          Value: v2-with-s3-zip
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
