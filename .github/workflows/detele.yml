@@ -18,13 +18,14 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: MinTic Delete EC2 Stack
+    - name: MinTic Delete Full Architecture Stack
       run: |
-        echo "Eliminando stack MinTicEC2Stack..."
-        aws cloudformation delete-stack --stack-name MinTicEC2Stack
+        echo "Eliminando stack MinticFullArchitecture..."
+        aws cloudformation delete-stack --stack-name MinticFullArchitecture
         
         echo "Esperando a que se complete la eliminación..."
-        aws cloudformation wait stack-delete-complete --stack-name MinTicEC2Stack
+        aws cloudformation wait stack-delete-complete --stack-name MinticFullArchitecture
         
-        echo "Stack MinTicEC2Stack eliminado exitosamente!"
+        echo "Stack MinticFullArchitecture eliminado exitosamente!"
+        echo "Recursos eliminados: VPC, Subnets, IGW, ALB, 4 EC2, ASG, Security Group"
 
