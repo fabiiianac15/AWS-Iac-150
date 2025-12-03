@@ -18,7 +18,7 @@ Parameters:
 
   InstanceType:
     Type: String
-    Default: t2.micro
+    Default: t3.micro
     Description: Tipo de instancia para EC2 y LaunchTemplate
 
 Resources:

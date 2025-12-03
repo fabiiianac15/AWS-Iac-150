@@ -28,7 +28,7 @@ jobs:
           --parameter-overrides \
             MinticKeyName=KeyNew \
             MinticAmiId=ami-0f88e80871fd81e91 \
-            InstanceType=t2.micro \
+            InstanceType=t3.micro \
           --capabilities CAPABILITY_IAM \
           --no-fail-on-empty-changeset
         
