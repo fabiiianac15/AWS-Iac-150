@@ -20,19 +20,22 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Deploy EC2 Stack with S3 Access
+    - name: Deploy Mintic Full Architecture
       run: |
         aws cloudformation deploy \
-          --template-file templates/ec2.yml \
-          --stack-name MinTicEC2Stack \
-          --parameter-overrides S3BucketName=mintic-bucket-004807598266-us-east-1 \
+          --template-file templates/mintic-architecture.yml \
+          --stack-name MinticFullArchitecture \
+          --parameter-overrides \
+            MinticKeyName=ssh-iac-mintic-ec2 \
+            MinticAmiId=ami-0f88e80871fd81e91 \
+            InstanceType=t2.micro \
           --capabilities CAPABILITY_IAM \
           --no-fail-on-empty-changeset
-        echo "EC2 Stack deployed with S3 access!"
         
-        # Mostrar la URL del servidor web
-        echo "URL del servidor web:"
+        echo "Arquitectura Mintic desplegada exitosamente!"
+        echo ""
+        echo "Outputs del Stack:"
         aws cloudformation describe-stacks \
-          --stack-name MinTicEC2Stack \
-          --query 'Stacks[0].Outputs[?OutputKey==`WebsiteURL`].OutputValue' \
-          --output text
+          --stack-name MinticFullArchitecture \
+          --query 'Stacks[0].Outputs[].[OutputKey,OutputValue]' \
+          --output table
