@@ -26,7 +26,7 @@ jobs:
           --template-file templates/mintic-architecture.yml \
           --stack-name MinticFullArchitecture \
           --parameter-overrides \
-            MinticKeyName=ssh-iac-mintic-ec2 \
+            MinticKeyName=KeyNew \
             MinticAmiId=ami-0f88e80871fd81e91 \
             InstanceType=t2.micro \
           --capabilities CAPABILITY_IAM \

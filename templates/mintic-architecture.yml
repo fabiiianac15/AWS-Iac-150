@@ -9,7 +9,7 @@ Parameters:
   MinticKeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Nombre del par de claves SSH para instancias
-    Default: ssh-iac-mintic-ec2
+    Default: KeyNew
 
   MinticAmiId:
     Type: String
