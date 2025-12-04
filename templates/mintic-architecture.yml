@@ -213,6 +213,15 @@ Resources:
       TargetGroupARNs:
         - !Ref MinticTargetGroup
 
+  # Warm Pool - mantiene 1 instancia en estado detenido lista para arrancar
+  MinticWarmPool:
+    Type: AWS::AutoScaling::WarmPool
+    Properties:
+      AutoScalingGroupName: !Ref MinticASG
+      PoolState: Stopped
+      MinSize: 1
+      MaxGroupPreparedCapacity: 3
+
 Outputs:
   MinticVPCId:
     Description: ID de la VPC

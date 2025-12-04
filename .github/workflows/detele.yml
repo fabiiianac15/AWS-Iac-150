@@ -1,4 +1,4 @@
-name: MinTic Delete AWS CloudFormation Stack
+name: MinTic Delete AWS CloudFormation Stacks
 
 on:
   workflow_dispatch:
@@ -18,14 +18,44 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: MinTic Delete Full Architecture Stack
+    - name: Delete All Stacks in Reverse Order
       run: |
-        echo "Eliminando stack MinticFullArchitecture..."
-        aws cloudformation delete-stack --stack-name MinticFullArchitecture
+        echo "��️ Eliminando stacks en orden inverso..."
         
-        echo "Esperando a que se complete la eliminación..."
-        aws cloudformation wait stack-delete-complete --stack-name MinticFullArchitecture
+        # Stage 6: Delete ASG Stack
+        echo "Eliminando ASG Stack..."
+        aws cloudformation delete-stack --stack-name MinticASGStack || true
+        aws cloudformation wait stack-delete-complete --stack-name MinticASGStack || true
+        echo "✅ ASG Stack eliminado"
         
-        echo "Stack MinticFullArchitecture eliminado exitosamente!"
-        echo "Recursos eliminados: VPC, Subnets, IGW, ALB, 4 EC2, ASG, Security Group"
-
+        # Stage 5: Delete ALB Stack
+        echo "Eliminando ALB Stack..."
+        aws cloudformation delete-stack --stack-name MinticALBStack || true
+        aws cloudformation wait stack-delete-complete --stack-name MinticALBStack || true
+        echo "✅ ALB Stack eliminado"
+        
+        # Stage 4: Delete EC2 Stack
+        echo "Eliminando EC2 Stack..."
+        aws cloudformation delete-stack --stack-name MinticEC2Stack || true
+        aws cloudformation wait stack-delete-complete --stack-name MinticEC2Stack || true
+        echo "✅ EC2 Stack eliminado"
+        
+        # Stage 3: Delete Security Stack
+        echo "Eliminando Security Stack..."
+        aws cloudformation delete-stack --stack-name MinticSecurityStack || true
+        aws cloudformation wait stack-delete-complete --stack-name MinticSecurityStack || true
+        echo "✅ Security Stack eliminado"
+        
+        # Stage 2: Delete VPC Stack
+        echo "Eliminando VPC Stack..."
+        aws cloudformation delete-stack --stack-name MinticVPCStack || true
+        aws cloudformation wait stack-delete-complete --stack-name MinticVPCStack || true
+        echo "✅ VPC Stack eliminado"
+        
+        # Delete old monolithic stack if exists
+        echo "Eliminando stack monolítico antiguo (si existe)..."
+        aws cloudformation delete-stack --stack-name MinticFullArchitecture || true
+        aws cloudformation wait stack-delete-complete --stack-name MinticFullArchitecture || true
+        
+        echo ""
+        echo "🎉 Todos los stacks eliminados exitosamente!"
